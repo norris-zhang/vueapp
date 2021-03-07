@@ -1,5 +1,5 @@
 <template>
-  <dir id="app">
+  <div id="app">
     <nav>
       <div class="navigation__logo">
         Twotter
@@ -9,7 +9,7 @@
       </div>
     </nav>
     <UserProfile />
-  </dir>
+  </div>
 </template>
 
 <script>
@@ -48,15 +48,15 @@ export default {
     padding: 10px 5%;
     background-color: deeppink;
     color: white;
-  }
 
-  .navigation__loop {
-    font-weight: bold;
-    font-size: 24px;
-  }
+    .navigation__loop {
+      font-weight: bold;
+      font-size: 24px;
+    }
 
-  .navigation__user {
-    font-weight: bold;
+    .navigation__user {
+      font-weight: bold;
+    }
   }
 }
 </style>
