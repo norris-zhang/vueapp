@@ -2,19 +2,19 @@
   <div class="user-profile">
     <div class="user-profile__user-panel">
       <h1 class="user-profile__username">@{{ fullname }}</h1>
-      <div class="user-profile__admin-badge" v-if="followers > 5">Admin</div>
+      <div class="user-profile__admin-badge" v-if="state.followers > 5">Admin</div>
       <div class="user-profile__admin-no-badge" v-else>&nbsp;</div>
       <div class="user-profile__follower-count">
-        <strong>Followers: </strong> {{ followers }}
+        <strong>Followers: </strong> {{ state.followers }}
       </div>
       <button @click="followUser">Follow</button>
       <CreateTwootPanel @add-twoot="addTwoot"/>
     </div>
     <div class="user-profile__twoots-wrapper">
       <TwootItem
-        v-for="twoot in user.twoots"
+        v-for="twoot in state.user.twoots"
         :key="twoot.id"
-        :username="user.username"
+        :username="state.user.username"
         :twoot="twoot"
         @favourite="toggleFavourite"
       />
@@ -25,12 +25,13 @@
 <script>
 import TwootItem from "./TwootItem";
 import CreateTwootPanel from "./CreateTwootPanel";
+import { reactive, computed, watch } from 'vue'
 
 export default {
   name: "UserProfile",
   components: { TwootItem, CreateTwootPanel },
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       followers: 0,
       user: {
         id: 1,
@@ -47,34 +48,42 @@ export default {
           },
           { id: 2, content: "I am not a long text." },
         ],
-      },
-    };
-  },
-  watch: {
-    followers(newFollowers, oldFollowers) {
-      if (newFollowers > oldFollowers) {
-        console.log(`${this.fullname} gained a new follower!`);
       }
-    },
-  },
-  computed: {
-    fullname() {
-      return `${this.user.firstName} ${this.user.lastName}`;
-    },
-  },
-  methods: {
-    followUser() {
-      this.followers++;
-    },
-    toggleFavourite(id) {
+    });
+
+    const fullname = computed(() => `${state.user.firstName} ${state.user.lastName}`);
+
+    watch(
+      () => state.followers,
+      (newFollowers, oldFollowers) => {
+        if (newFollowers > oldFollowers) {
+          console.log(`${fullname.value} gained a new follower!`);
+        }
+      }
+    );
+
+    function followUser() {
+      state.followers++;
+    }
+
+    function toggleFavourite(id) {
       console.log(`Favourite #${id}`);
-    },
-    addTwoot(newTwootContent) {
-      this.user.twoots.unshift({
-        id: this.user.twoots.length + 1,
+    }
+
+    function addTwoot(newTwootContent) {
+      state.user.twoots.unshift({
+        id: state.user.twoots.length + 1,
         content: newTwootContent,
       });
-    },
+    }
+
+    return {
+      state,
+      fullname,
+      followUser,
+      toggleFavourite,
+      addTwoot
+    };
   },
   mounted() {
     console.log("mounted");
