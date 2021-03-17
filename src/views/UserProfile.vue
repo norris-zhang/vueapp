@@ -1,8 +1,13 @@
 <template>
   <div class="user-profile">
+    <router-link to="/"><h1>Home</h1></router-link>
+    
+    |
+    <h1>User Profile</h1>
+    <h2>{{ userId }}</h2>
     <div class="user-profile__user-panel">
       <h1 class="user-profile__username">@{{ fullname }}</h1>
-      <div class="user-profile__admin-badge" v-if="state.followers > 5">Admin</div>
+      <div class="user-profile__admin-badge" v-if="state.user.isAdmin">Admin</div>
       <div class="user-profile__admin-no-badge" v-else>&nbsp;</div>
       <div class="user-profile__follower-count">
         <strong>Followers: </strong> {{ state.followers }}
@@ -23,32 +28,23 @@
 </template>
 
 <script>
-import TwootItem from "./TwootItem";
-import CreateTwootPanel from "./CreateTwootPanel";
-import { reactive, computed, watch } from 'vue'
+import { useRoute } from 'vue-router';
+import TwootItem from "@/components/TwootItem";
+import CreateTwootPanel from "@/components/CreateTwootPanel";
+import { reactive, computed, watch } from 'vue';
+import { users } from '@/assets/users.js'
 
 export default {
   name: "UserProfile",
   components: { TwootItem, CreateTwootPanel },
   setup() {
+    const route = useRoute();
+    const userId = computed(() => route.params.userId);
+
+
     const state = reactive({
       followers: 0,
-      user: {
-        id: 1,
-        username: "nzhang",
-        firstName: "Norris",
-        lastName: "Zhang",
-        email: "nzhang@bravurasolutions.com",
-        isAdmin: true,
-        twoots: [
-          {
-            id: 1,
-            content:
-              "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, ea enim, a eligendi saepe consequuntur nihil sapiente nemo eaque necessitatibus unde cumque distinctio atque soluta porro corporis officia. Odio, error!",
-          },
-          { id: 2, content: "I am not a long text." },
-        ],
-      }
+      user: users[userId.value] || users[1]
     });
 
     const fullname = computed(() => `${state.user.firstName} ${state.user.lastName}`);
@@ -82,7 +78,8 @@ export default {
       fullname,
       followUser,
       toggleFavourite,
-      addTwoot
+      addTwoot,
+      userId
     };
   },
   mounted() {
